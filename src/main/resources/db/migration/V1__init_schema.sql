@@ -3,6 +3,10 @@ CREATE TABLE book (
    uid VARCHAR(50) NOT NULL,
    rack_number VARCHAR(50) NOT NULL,
    book_id VARCHAR(50) NOT NULL,
+   title VARCHAR(50) NOT NULL,
+   author VARCHAR(50) NOT NULL,
+   subject_category VARCHAR(50) NOT NULL,
+   publication_date DATE NOT NULL,
    primary key (uid)
 );
 

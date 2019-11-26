@@ -2,8 +2,10 @@ package com.github.dhiraj072.LibMgtSystem;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
+import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -40,6 +42,15 @@ public class Library {
     if (!isCheckedOut(uid))
       return book;
     return null;
+  }
+
+  public List<Book> searchBooks(BookSearchQuery query) {
+
+    return em.createNamedQuery(Book.SEARCH_BOOKS, Book.class)
+        .setParameter(Book.TITLE, query.getTitle())
+        .setParameter(Book.AUTHOR, query.getAuthor())
+        .setParameter(Book.SUB_CATEGORY, query.getSubjectCategory())
+        .getResultList();
   }
 
   public void checkout(Book book, Member member) {
