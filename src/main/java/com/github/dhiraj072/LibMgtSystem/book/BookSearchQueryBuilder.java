@@ -1,5 +1,7 @@
 package com.github.dhiraj072.LibMgtSystem.book;
 
+import java.time.LocalDate;
+
 public class BookSearchQueryBuilder {
 
   private BookSearchQuery bookSearchQuery;
@@ -24,6 +26,12 @@ public class BookSearchQueryBuilder {
   public BookSearchQueryBuilder subjectCategory(String c) {
 
     bookSearchQuery.setSubjectCategory(c);
+    return this;
+  }
+
+  public BookSearchQueryBuilder publicationDate(LocalDate d) {
+
+    bookSearchQuery.setPublicationDate(d);
     return this;
   }
 

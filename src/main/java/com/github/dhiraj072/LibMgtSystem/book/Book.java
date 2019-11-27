@@ -6,17 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
-@NamedQueries({
-    @NamedQuery(name = Book.SEARCH_BOOKS,
-        query = "select b from Book b where " +
-            "b.title like CONCAT('%',:title,'%') and " +
-            "b.author like CONCAT('%',:author,'%') and " +
-            "b.subjectCategory like CONCAT('%',:subjectCategory,'%')"
-    )
-})
 @Entity
 public class Book {
 
@@ -63,6 +53,7 @@ public class Book {
   public static final String TITLE = "title";
   public static final String AUTHOR = "author";
   public static final String SUB_CATEGORY = "subjectCategory";
+  public static final String PUB_DATE = "publicationDate";
 
   public String getUid() {
 

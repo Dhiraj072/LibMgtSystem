@@ -107,17 +107,35 @@ public class LibraryIntegrationTest {
   }
 
   @Test
-  void testSearchBooksByTitleAuthorSubCategory() {
+  void testSearchBooksByPublicationDate() {
+
+    library.addBook(book1);
+    BookSearchQuery q = new BookSearchQueryBuilder()
+        .publicationDate(book1.getPublicationDate())
+        .build();
+    BookSearchQuery noResultQuery = new BookSearchQueryBuilder()
+        .publicationDate(LocalDate.now().minusDays(1))
+        .build();
+    assertEquals(1, library.searchBooks(q).size());
+    assertEquals(0, library.searchBooks(noResultQuery).size());
+  }
+
+  @Test
+  void testSearchBooksByTitleAuthorSubCategoryPubDate() {
 
     library.addBook(book1);
     BookSearchQuery strictQuery = new BookSearchQueryBuilder()
         .title("Title1")
         .author("Author1")
-        .subjectCategory("Category1").build();
+        .subjectCategory("Category1")
+        .publicationDate(book1.getPublicationDate())
+        .build();
     BookSearchQuery noResultQuery = new BookSearchQueryBuilder()
         .title("xxxxxxx")
         .subjectCategory("xxxxx")
-        .author("xxxxxxx").build();
+        .author("xxxxxxx")
+        .publicationDate(LocalDate.now().minusDays(1))
+        .build();
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(0, library.searchBooks(noResultQuery).size());
     library.addBook(book2);

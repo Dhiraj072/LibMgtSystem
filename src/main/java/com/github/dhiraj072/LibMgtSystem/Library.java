@@ -5,9 +5,14 @@ import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +51,26 @@ public class Library {
 
   public List<Book> searchBooks(BookSearchQuery query) {
 
-    return em.createNamedQuery(Book.SEARCH_BOOKS, Book.class)
-        .setParameter(Book.TITLE, query.getTitle())
-        .setParameter(Book.AUTHOR, query.getAuthor())
-        .setParameter(Book.SUB_CATEGORY, query.getSubjectCategory())
-        .getResultList();
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    CriteriaQuery<Book> searchQuery = cb.createQuery(Book.class);
+    Root<Book> root = searchQuery.from(Book.class);
+    searchQuery.select(root);
+    List<Predicate> filters = new ArrayList<>();
+    if (query.getTitle() != null)
+        filters.add(cb.like(root.get(Book.TITLE), like(query.getTitle())));
+    if (query.getAuthor() != null)
+        filters.add(cb.like(root.get(Book.AUTHOR), like(query.getAuthor())));
+    if (query.getSubjectCategory() != null)
+        filters.add(cb.like(root.get(Book.SUB_CATEGORY), like(query.getSubjectCategory())));
+    if (query.getPublicationDate() != null)
+        filters.add(cb.equal(root.get(Book.PUB_DATE), query.getPublicationDate()));
+    searchQuery.where(filters.toArray(new Predicate[0]));
+    return em.createQuery(searchQuery).getResultList();
+  }
+
+  private String like(String str) {
+
+    return "%".concat(str).concat("%");
   }
 
   public void checkout(Book book, Member member) {
