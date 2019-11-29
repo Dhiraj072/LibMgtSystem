@@ -1,5 +1,6 @@
 package com.github.dhiraj072.LibMgtSystem.member;
 
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,17 +10,30 @@ import javax.persistence.Id;
 @Entity
 public class Member {
 
-  public Member(String name) {
+  public Member(String userName) {
 
-    this.name = name;
+    this(userName, userName);
   }
 
-  @Id
+  public Member(String userName, String name) {
+
+    this.userName = userName;
+    this.name = name;
+    this.joinDate = LocalDate.now();
+  }
+
   @GeneratedValue(strategy= GenerationType.IDENTITY)
   private Long id;
 
+  @Id
+  @Column
+  private String userName;
+
   @Column
   private String name;
+
+  @Column
+  private LocalDate joinDate;
 
   public Long getId() {
 
@@ -29,5 +43,15 @@ public class Member {
   public String getName() {
 
     return name;
+  }
+
+  public String getUserName() {
+
+    return userName;
+  }
+
+  public LocalDate getJoinDate() {
+
+    return joinDate;
   }
 }

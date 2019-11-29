@@ -15,7 +15,7 @@ import javax.persistence.NamedQuery;
 
 @NamedQueries({
     @NamedQuery(name = BookCheckout.GET_LATEST_CHECKOUT,
-        query = "select c from BookCheckout c where c.bookUid = :uid order by c.id desc"
+        query = "select c from BookCheckout c where c.book = :book order by c.id desc"
     )
 })
 @Entity
@@ -25,11 +25,12 @@ public class BookCheckout {
   @GeneratedValue(strategy= GenerationType.IDENTITY)
   private Long id;
 
-  @Column
-  private String bookUid;
+  @ManyToOne
+  @JoinColumn(name = "book_uid")
+  private Book book;
 
   @ManyToOne
-  @JoinColumn(name = "member_id", referencedColumnName = "id")
+  @JoinColumn(name = "user_name")
   private Member member;
 
   @Column
@@ -40,13 +41,15 @@ public class BookCheckout {
 
   public BookCheckout(Book book, Member member) {
 
-    this.bookUid = book.getUid();
+    this.book = book;
     this.member = member;
     this.checkoutDate = LocalDate.now();
     this.returnDate = null;
   }
 
   public static final String GET_LATEST_CHECKOUT = "bookdao.latestCheckout";
+  public static final String MEMBER = "member";
+  public static final String RETURN_DATE = "returnDate";
 
   public LocalDateTime getReturnDate() {
 
@@ -61,5 +64,15 @@ public class BookCheckout {
   public Member getMember() {
 
     return member;
+  }
+
+  public Book getBook() {
+
+    return book;
+  }
+
+  public LocalDate getCheckoutDate() {
+
+    return checkoutDate;
   }
 }

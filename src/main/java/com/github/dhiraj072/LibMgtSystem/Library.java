@@ -1,5 +1,8 @@
 package com.github.dhiraj072.LibMgtSystem;
 
+import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.MEMBER;
+import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.RETURN_DATE;
+
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
@@ -7,6 +10,8 @@ import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -31,6 +36,14 @@ public class Library {
   @PersistenceContext
   private EntityManager em;
 
+  private CriteriaBuilder cb;
+
+  @PostConstruct
+  public void init() {
+
+    cb = em.getCriteriaBuilder();
+  }
+
   public void addMember(Member m) {
 
     em.persist(m);
@@ -44,14 +57,25 @@ public class Library {
   public Book getBook(String uid) {
 
     Book book = em.find(Book.class, uid);
-    if (!isCheckedOut(uid))
+    if (!isCheckedOut(book))
       return book;
     return null;
   }
 
+  public List<Book> getCheckedOutBooks(Member member) {
+
+    CriteriaQuery<BookCheckout> searchQuery = cb.createQuery(BookCheckout.class);
+    Root<BookCheckout> bookCheckout = searchQuery.from(BookCheckout.class);
+    searchQuery.select(bookCheckout);
+    Predicate checkedOutByMember = cb.equal(bookCheckout.get(MEMBER), member);
+    Predicate bookNotReturned = cb.isNull(bookCheckout.get(RETURN_DATE));
+    searchQuery.where(checkedOutByMember, bookNotReturned);
+    List<BookCheckout> bcs = em.createQuery(searchQuery).getResultList();
+    return bcs.stream().map(BookCheckout::getBook).collect(Collectors.toList());
+  }
+
   public List<Book> searchBooks(BookSearchQuery query) {
 
-    CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Book> searchQuery = cb.createQuery(Book.class);
     Root<Book> root = searchQuery.from(Book.class);
     searchQuery.select(root);
@@ -75,7 +99,7 @@ public class Library {
 
   public void checkout(Book book, Member member) {
 
-    if (isCheckedOut(book.getUid()))
+    if (isCheckedOut(book))
       throw new IllegalArgumentException("Book " + book.getUid() + " is already checked out");
     BookCheckout checkout = new BookCheckout(book, member);
     em.persist(checkout);
@@ -84,23 +108,24 @@ public class Library {
 
   public void returnBook(Book book) {
 
-    if (!isCheckedOut(book.getUid()))
+    if (!isCheckedOut(book))
       throw new IllegalArgumentException("Invalid return for " + book.getUid() +" not checked out");
-    BookCheckout latest = getLatestCheckout(book.getUid());
+    BookCheckout latest = getLatestCheckout(book);
     latest.setReturnDate(LocalDateTime.now());
     em.persist(latest);
+    LOGGER.info("Book {} has been returned to library", book.getUid(), latest.getMember().getUserName());
   }
 
-  private boolean isCheckedOut(String uid) {
+  private boolean isCheckedOut(Book book) {
 
-    BookCheckout latestCheckout = getLatestCheckout(uid);
+    BookCheckout latestCheckout = getLatestCheckout(book);
     return latestCheckout != null && latestCheckout.getReturnDate() == null;
   }
 
-  private BookCheckout getLatestCheckout(String uid) {
+  private BookCheckout getLatestCheckout(Book book) {
 
     return DataAccessUtils.singleResult(
         em.createNamedQuery(BookCheckout.GET_LATEST_CHECKOUT, BookCheckout.class)
-            .setParameter("uid", uid).getResultList());
+            .setParameter("book", book).getResultList());
   }
 }

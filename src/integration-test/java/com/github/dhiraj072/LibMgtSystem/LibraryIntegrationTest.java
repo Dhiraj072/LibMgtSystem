@@ -9,6 +9,7 @@ import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQueryBuilder;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDate;
+import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,7 +27,8 @@ public class LibraryIntegrationTest {
 
   private Book book1;
   private Book book2;
-  private Member member;
+  private Member member1;
+  private Member member2;
   private final BookSearchQuery emptyQuery = new BookSearchQueryBuilder().build();
   private static final String UID_1 = "1";
   private static final String UID_2 = "2";
@@ -38,8 +40,10 @@ public class LibraryIntegrationTest {
         "Author1", "Category1", LocalDate.now());
     book2 = new Book(UID_2, "F25", "335", "Title2",
         "Author2", "Category2", LocalDate.now());
-    member = new Member("name");
-    library.addMember(member);
+    member1 = new Member("name1");
+    member2 = new Member("name2");
+    library.addMember(member1);
+    library.addMember(member2);
   }
 
   @Test
@@ -55,7 +59,7 @@ public class LibraryIntegrationTest {
 
     library.addBook(book1);
     assertNotNull(library.getBook(UID_1));
-    library.checkout(book1, member);
+    library.checkout(book1, member1);
     assertNull(library.getBook(UID_1));
     library.returnBook(book1);
     assertNotNull(library.getBook(UID_1));
@@ -141,5 +145,38 @@ public class LibraryIntegrationTest {
     library.addBook(book2);
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(0, library.searchBooks(noResultQuery).size());
+  }
+
+  @Test
+  public void testGetCheckedOutBooksByMember() {
+
+    List<Book> checkedOutMbr1, checkedOutMbr2;
+    library.addBook(book1);
+    library.addBook(book2);
+
+    // Member 1 checks out book1, Member 2 nothing
+    library.checkout(book1, member1);
+    checkedOutMbr1 = library.getCheckedOutBooks(member1);
+    checkedOutMbr2 = library.getCheckedOutBooks(member2);
+    assertEquals(1, checkedOutMbr1.size());
+    assertEquals(0, checkedOutMbr2.size());
+    assertEquals(book1.getUid(), checkedOutMbr1.get(0).getUid());
+
+    // Member 1 checks out book2, Member 2 nothing
+    library.checkout(book2, member1);
+    checkedOutMbr1 = library.getCheckedOutBooks(member1);
+    assertEquals(checkedOutMbr1.size(), 2);
+    assertEquals(book1.getUid(), checkedOutMbr1.get(0).getUid());
+    assertEquals(book2.getUid(), checkedOutMbr1.get(1).getUid());
+
+    // Member 1 returns book2, Member 2 checks out book 1
+    library.returnBook(book1);
+    library.checkout(book1, member2);
+    checkedOutMbr1 = library.getCheckedOutBooks(member1);
+    checkedOutMbr2 = library.getCheckedOutBooks(member2);
+    assertEquals(1, checkedOutMbr1.size());
+    assertEquals(1, checkedOutMbr2.size());
+    assertEquals(book1.getUid(), checkedOutMbr2.get(0).getUid());
+    assertEquals(book2.getUid(), checkedOutMbr1.get(0).getUid());
   }
 }
