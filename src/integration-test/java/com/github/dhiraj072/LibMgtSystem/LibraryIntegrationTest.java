@@ -3,12 +3,14 @@ package com.github.dhiraj072.LibMgtSystem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQueryBuilder;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -27,6 +29,12 @@ public class LibraryIntegrationTest {
 
   private Book book1;
   private Book book2;
+  private Book book3;
+  private Book book4;
+  private Book book5;
+  private Book book6;
+  private List<Book> books;
+
   private Member member1;
   private Member member2;
   private final BookSearchQuery emptyQuery = new BookSearchQueryBuilder().build();
@@ -40,6 +48,15 @@ public class LibraryIntegrationTest {
         "Author1", "Category1", LocalDate.now());
     book2 = new Book(UID_2, "F25", "335", "Title2",
         "Author2", "Category2", LocalDate.now());
+    book3 = new Book("UID_3", "F3", "33", "Title3",
+        "Author3", "Category3", LocalDate.now());
+    book4 = new Book("UID_4", "F4", "44", "Title4",
+        "Author4", "Category4", LocalDate.now());
+    book5 = new Book("UID_5", "F5", "55", "Title5",
+        "Author5", "Category5", LocalDate.now());
+    book6 = new Book("UID_6", "F6", "66", "Title6",
+        "Author6", "Category6", LocalDate.now());
+    books = Arrays.asList(book1, book2, book3, book4, book5, book6);
     member1 = new Member("name1");
     member2 = new Member("name2");
     library.addMember(member1);
@@ -178,5 +195,13 @@ public class LibraryIntegrationTest {
     assertEquals(1, checkedOutMbr2.size());
     assertEquals(book1.getUid(), checkedOutMbr2.get(0).getUid());
     assertEquals(book2.getUid(), checkedOutMbr1.get(0).getUid());
+  }
+
+  @Test
+  public void testMaxBookCheckoutLimit() {
+
+    library.addBooks(books);
+    assertThrows(IllegalArgumentException.class,
+        () -> books.forEach(b -> library.checkout(b, member1)));
   }
 }

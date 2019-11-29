@@ -2,6 +2,7 @@ package com.github.dhiraj072.LibMgtSystem;
 
 import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.MEMBER;
 import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.RETURN_DATE;
+import static com.github.dhiraj072.LibMgtSystem.member.Member.MAX_BOOKS;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
@@ -47,6 +48,11 @@ public class Library {
   public void addMember(Member m) {
 
     em.persist(m);
+  }
+
+  public void addBooks(List<Book> books) {
+
+    books.forEach(this::addBook);
   }
 
   public void addBook(Book book) {
@@ -99,6 +105,10 @@ public class Library {
 
   public void checkout(Book book, Member member) {
 
+    if (getCheckedOutBooks(member).size() >= MAX_BOOKS)
+      throw new IllegalArgumentException(
+          "Unable to checkout book as member " + member.getUserName() +
+              " has already reached max limit of " + MAX_BOOKS);
     if (isCheckedOut(book))
       throw new IllegalArgumentException("Book " + book.getUid() + " is already checked out");
     BookCheckout checkout = new BookCheckout(book, member);

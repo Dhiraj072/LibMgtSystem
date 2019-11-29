@@ -10,6 +10,8 @@ import javax.persistence.Id;
 @Entity
 public class Member {
 
+  public static final int MAX_BOOKS = 5;
+
   public Member(String userName) {
 
     this(userName, userName);
