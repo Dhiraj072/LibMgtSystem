@@ -12,6 +12,8 @@ public class Member {
 
   public static final int MAX_BOOKS = 5;
 
+  public Member() { }
+
   public Member(String userName) {
 
     this(userName, userName);
@@ -55,5 +57,11 @@ public class Member {
   public LocalDate getJoinDate() {
 
     return joinDate;
+  }
+
+  @Override
+  public String toString() {
+
+    return this.getUserName();
   }
 }

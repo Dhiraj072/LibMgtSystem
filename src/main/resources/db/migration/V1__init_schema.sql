@@ -28,3 +28,13 @@ CREATE TABLE book_checkout (
    foreign key (book_uid) references book(uid),
    foreign key (user_name) references member(user_name)
 );
+
+CREATE TABLE fine (
+   id INT NOT NULL AUTO_INCREMENT,
+   amount INT NOT NULL,
+   imposed_date DATE NOT NULL,
+   payment_date DATE,
+   book_checkout_id INT NOT NULL,
+   primary key (book_checkout_id),
+   foreign key (book_checkout_id) references book_checkout(id)
+);

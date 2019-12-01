@@ -39,6 +39,8 @@ public class BookCheckout {
   @Column
   private LocalDateTime returnDate;
 
+  public BookCheckout() { }
+
   public BookCheckout(Book book, Member member) {
 
     this.book = book;

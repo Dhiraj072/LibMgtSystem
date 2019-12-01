@@ -3,20 +3,24 @@ package com.github.dhiraj072.LibMgtSystem;
 import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.MEMBER;
 import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.RETURN_DATE;
 import static com.github.dhiraj072.LibMgtSystem.member.Member.MAX_BOOKS;
+import static com.github.dhiraj072.LibMgtSystem.system.Fine.PAYMENT_DATE;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
+import com.github.dhiraj072.LibMgtSystem.system.Fine;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -24,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +42,9 @@ public class Library {
   @PersistenceContext
   private EntityManager em;
 
+  @Resource
+  private ResourceLoader resourceLoader;
+
   private CriteriaBuilder cb;
 
   @PostConstruct
@@ -48,6 +56,7 @@ public class Library {
   public void addMember(Member m) {
 
     em.persist(m);
+    LOGGER.info("New member {} added to library", m.getUserName());
   }
 
   public void addBooks(List<Book> books) {
@@ -58,6 +67,7 @@ public class Library {
   public void addBook(Book book) {
 
     em.persist(book);
+    LOGGER.info("New book {} added to library", book.getUid());
   }
 
   public Book getBook(String uid) {
@@ -123,7 +133,33 @@ public class Library {
     BookCheckout latest = getLatestCheckout(book);
     latest.setReturnDate(LocalDateTime.now());
     em.persist(latest);
-    LOGGER.info("Book {} has been returned to library", book.getUid(), latest.getMember().getUserName());
+    if (isLateReturn(latest))
+      imposeFine(latest);
+    LOGGER.info("Book {} has been returned to library", book.getUid());
+  }
+
+  public List<Fine> getPendingFines(Member m) {
+
+    CriteriaQuery<Fine> searchQuery = cb.createQuery(Fine.class);
+    Root<Fine> fine = searchQuery.from(Fine.class);
+    Join<Fine, BookCheckout> fineBookCheckoutJoin = fine.join("bookCheckout");
+    searchQuery.select(fine);
+    Predicate checkedOutByMember = cb.equal(fineBookCheckoutJoin.get(MEMBER), m);
+    Predicate fineNotPaid = cb.isNull(fine.get(PAYMENT_DATE));
+    searchQuery.where(checkedOutByMember, fineNotPaid);
+    return em.createQuery(searchQuery).getResultList();
+  }
+
+  private void imposeFine(BookCheckout checkout) {
+
+    Fine fine = new Fine(checkout);
+    em.persist(fine);
+    LOGGER.info("Fine of {} imposed on {}", fine.getAmount(), checkout.getMember());
+  }
+
+  private boolean isLateReturn(BookCheckout latest) {
+
+    return latest.getReturnDate().plusDays(10).isAfter(LocalDateTime.now());
   }
 
   private boolean isCheckedOut(Book book) {
