@@ -1,4 +1,4 @@
-package com.github.dhiraj072.LibMgtSystem.system;
+package com.github.dhiraj072.LibMgtSystem.fine;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 

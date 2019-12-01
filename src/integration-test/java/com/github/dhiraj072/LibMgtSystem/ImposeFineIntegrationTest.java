@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
-import com.github.dhiraj072.LibMgtSystem.system.Fine;
+import com.github.dhiraj072.LibMgtSystem.fine.Fine;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Resource;
