@@ -11,15 +11,17 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@SpringBootTest
+@SpringBootTest(classes = { H2IntegrationTestContext.class })
 @TestInstance(Lifecycle.PER_CLASS)
 @Transactional
 @Rollback
+@ActiveProfiles("IntegrationTest")
 public @interface H2IntegrationTest {
 
 }

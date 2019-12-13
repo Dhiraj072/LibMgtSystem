@@ -14,6 +14,7 @@ CREATE TABLE member (
    id INT NOT NULL AUTO_INCREMENT,
    user_name VARCHAR(50) NOT NULL,
    name VARCHAR(50) NOT NULL,
+   email VARCHAR(50) NOT NULL,
    join_date DATE NOT NULL,
    primary key (user_name)
 );

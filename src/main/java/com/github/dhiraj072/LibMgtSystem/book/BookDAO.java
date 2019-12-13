@@ -4,6 +4,7 @@ import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.MEMBER;
 import static com.github.dhiraj072.LibMgtSystem.book.BookCheckout.RETURN_DATE;
 
 import com.github.dhiraj072.LibMgtSystem.member.Member;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,15 @@ public class BookDAO {
     return null;
   }
 
+  public List<BookCheckout> getActiveCheckouts() {
+
+    CriteriaQuery<BookCheckout> searchQuery = cb.createQuery(BookCheckout.class);
+    Root<BookCheckout> bookCheckout = searchQuery.from(BookCheckout.class);
+    searchQuery.select(bookCheckout);
+    searchQuery.where(cb.isNull(bookCheckout.get(RETURN_DATE)));
+    return em.createQuery(searchQuery).getResultList();
+  }
+
   public List<Book> getCheckedOutBooks(Member member) {
 
     CriteriaQuery<BookCheckout> searchQuery = cb.createQuery(BookCheckout.class);
@@ -89,7 +99,7 @@ public class BookDAO {
   public BookCheckout returnBook(Book book) {
 
     BookCheckout latest = getLatestCheckout(book);
-    latest.setReturnDate(LocalDateTime.now());
+    latest.setReturnDate(LocalDate.now());
     em.persist(latest);
     return latest;
   }

@@ -9,14 +9,14 @@ import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.fine.FineDAO;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import com.github.dhiraj072.LibMgtSystem.fine.Fine;
-import java.time.LocalDateTime;
+import com.github.dhiraj072.LibMgtSystem.member.MemberDAO;
+import java.time.LocalDate;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Transactional
+@Transactional(TxType.REQUIRED)
 public class Library {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Library.class);
@@ -39,18 +39,18 @@ public class Library {
   @Resource
   private FineDAO fineDAO;
 
-  private CriteriaBuilder cb;
-
-  @PostConstruct
-  public void init() {
-
-    cb = em.getCriteriaBuilder();
-  }
+  @Resource
+  private MemberDAO memberDAO;
 
   public void addMember(Member m) {
 
-    em.persist(m);
+    memberDAO.addMember(m);
     LOGGER.info("New member {} added to library", m.getUserName());
+  }
+
+  public Member getMember(String userName) {
+
+    return memberDAO.getMember(userName);
   }
 
   public void addBooks(List<Book> books) {
@@ -107,6 +107,6 @@ public class Library {
 
   private boolean isLateReturn(BookCheckout latest) {
 
-    return latest.getReturnDate().plusDays(10).isAfter(LocalDateTime.now());
+    return latest.getReturnDate().plusDays(10).isAfter(LocalDate.now());
   }
 }

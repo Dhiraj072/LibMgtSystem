@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 
 @Entity
 public class Member {
@@ -14,19 +15,20 @@ public class Member {
 
   public Member() { }
 
-  public Member(String userName) {
+  public Member(String userName, String email) {
 
-    this(userName, userName);
+    this(userName, userName, email);
   }
 
-  public Member(String userName, String name) {
+  public Member(String userName, String name, String email) {
 
     this.userName = userName;
     this.name = name;
     this.joinDate = LocalDate.now();
+    this.email = email;
   }
 
-  @GeneratedValue(strategy= GenerationType.IDENTITY)
+  @GeneratedValue(strategy= GenerationType.AUTO)
   private Long id;
 
   @Id
@@ -35,6 +37,10 @@ public class Member {
 
   @Column
   private String name;
+
+  @Email
+  @Column
+  private String email;
 
   @Column
   private LocalDate joinDate;
@@ -57,6 +63,11 @@ public class Member {
   public LocalDate getJoinDate() {
 
     return joinDate;
+  }
+
+  public String getEmail() {
+
+    return email;
   }
 
   @Override

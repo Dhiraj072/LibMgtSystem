@@ -8,15 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQuery;
 import com.github.dhiraj072.LibMgtSystem.book.BookSearchQueryBuilder;
-import com.github.dhiraj072.LibMgtSystem.member.Member;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static com.github.dhiraj072.LibMgtSystem.TestUtils.*;
 
 @H2IntegrationTest
 public class LibraryIntegrationTest {
@@ -27,46 +28,22 @@ public class LibraryIntegrationTest {
   @PersistenceContext
   private EntityManager em;
 
-  private Book book1;
-  private Book book2;
-  private Book book3;
-  private Book book4;
-  private Book book5;
-  private Book book6;
   private List<Book> books;
 
-  private Member member1;
-  private Member member2;
   private final BookSearchQuery emptyQuery = new BookSearchQueryBuilder().build();
-  private static final String UID_1 = "1";
-  private static final String UID_2 = "2";
 
-  @BeforeAll
+  @BeforeEach
   void setup() {
 
-    book1 = new Book(UID_1, "F24", "334", "Title1",
-        "Author1", "Category1", LocalDate.now());
-    book2 = new Book(UID_2, "F25", "335", "Title2",
-        "Author2", "Category2", LocalDate.now());
-    book3 = new Book("UID_3", "F3", "33", "Title3",
-        "Author3", "Category3", LocalDate.now());
-    book4 = new Book("UID_4", "F4", "44", "Title4",
-        "Author4", "Category4", LocalDate.now());
-    book5 = new Book("UID_5", "F5", "55", "Title5",
-        "Author5", "Category5", LocalDate.now());
-    book6 = new Book("UID_6", "F6", "66", "Title6",
-        "Author6", "Category6", LocalDate.now());
-    books = Arrays.asList(book1, book2, book3, book4, book5, book6);
-    member1 = new Member("name1");
-    member2 = new Member("name2");
-    library.addMember(member1);
-    library.addMember(member2);
+    books = Arrays.asList(BOOK_1, BOOK_2, BOOK_3, BOOK_4, BOOK_5, BOOK_6);
+    library.addMember(MEMBER_1);
+    library.addMember(MEMBER_2);
   }
 
   @Test
   void testAddABookToLibrary() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     Book added = library.getBook(UID_1);
     assertNotNull(added);
   }
@@ -74,24 +51,24 @@ public class LibraryIntegrationTest {
   @Test
   void testChecksOutBookCorrectly() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     assertNotNull(library.getBook(UID_1));
-    library.checkout(book1, member1);
+    library.checkout(BOOK_1, MEMBER_1);
     assertNull(library.getBook(UID_1));
-    library.returnBook(book1);
+    library.returnBook(BOOK_1);
     assertNotNull(library.getBook(UID_1));
   }
 
   @Test
   void testSearchBooksByTitle() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     BookSearchQuery strictQuery = new BookSearchQueryBuilder().title("Title1").build();
     BookSearchQuery partialQuery = new BookSearchQueryBuilder().title("itle").build();
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(1, library.searchBooks(partialQuery).size());
     assertEquals(1, library.searchBooks(emptyQuery).size());
-    library.addBook(book2);
+    library.addBook(BOOK_2);
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(2, library.searchBooks(partialQuery).size());
     assertEquals(2, library.searchBooks(emptyQuery).size());
@@ -100,13 +77,13 @@ public class LibraryIntegrationTest {
   @Test
   void testSearchBooksByAuthor() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     BookSearchQuery strictQuery = new BookSearchQueryBuilder().author("Author1").build();
     BookSearchQuery partialQuery = new BookSearchQueryBuilder().author("uthor").build();
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(1, library.searchBooks(partialQuery).size());
     assertEquals(1, library.searchBooks(emptyQuery).size());
-    library.addBook(book2);
+    library.addBook(BOOK_2);
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(2, library.searchBooks(partialQuery).size());
     assertEquals(2, library.searchBooks(emptyQuery).size());
@@ -115,13 +92,13 @@ public class LibraryIntegrationTest {
   @Test
   void testSearchBooksBySubCategory() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     BookSearchQuery strictQuery = new BookSearchQueryBuilder().subjectCategory("Category1").build();
     BookSearchQuery partialQuery = new BookSearchQueryBuilder().subjectCategory("ategory").build();
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(1, library.searchBooks(partialQuery).size());
     assertEquals(1, library.searchBooks(emptyQuery).size());
-    library.addBook(book2);
+    library.addBook(BOOK_2);
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(2, library.searchBooks(partialQuery).size());
     assertEquals(2, library.searchBooks(emptyQuery).size());
@@ -130,9 +107,9 @@ public class LibraryIntegrationTest {
   @Test
   void testSearchBooksByPublicationDate() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     BookSearchQuery q = new BookSearchQueryBuilder()
-        .publicationDate(book1.getPublicationDate())
+        .publicationDate(BOOK_1.getPublicationDate())
         .build();
     BookSearchQuery noResultQuery = new BookSearchQueryBuilder()
         .publicationDate(LocalDate.now().minusDays(1))
@@ -144,12 +121,12 @@ public class LibraryIntegrationTest {
   @Test
   void testSearchBooksByTitleAuthorSubCategoryPubDate() {
 
-    library.addBook(book1);
+    library.addBook(BOOK_1);
     BookSearchQuery strictQuery = new BookSearchQueryBuilder()
         .title("Title1")
         .author("Author1")
         .subjectCategory("Category1")
-        .publicationDate(book1.getPublicationDate())
+        .publicationDate(BOOK_1.getPublicationDate())
         .build();
     BookSearchQuery noResultQuery = new BookSearchQueryBuilder()
         .title("xxxxxxx")
@@ -159,7 +136,7 @@ public class LibraryIntegrationTest {
         .build();
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(0, library.searchBooks(noResultQuery).size());
-    library.addBook(book2);
+    library.addBook(BOOK_2);
     assertEquals(1, library.searchBooks(strictQuery).size());
     assertEquals(0, library.searchBooks(noResultQuery).size());
   }
@@ -168,33 +145,33 @@ public class LibraryIntegrationTest {
   public void testGetCheckedOutBooksByMember() {
 
     List<Book> checkedOutMbr1, checkedOutMbr2;
-    library.addBook(book1);
-    library.addBook(book2);
+    library.addBook(BOOK_1);
+    library.addBook(BOOK_2);
 
-    // Member 1 checks out book1, Member 2 nothing
-    library.checkout(book1, member1);
-    checkedOutMbr1 = library.getCheckedOutBooks(member1);
-    checkedOutMbr2 = library.getCheckedOutBooks(member2);
+    // Member 1 checks out BOOK_1, Member 2 nothing
+    library.checkout(BOOK_1, MEMBER_1);
+    checkedOutMbr1 = library.getCheckedOutBooks(MEMBER_1);
+    checkedOutMbr2 = library.getCheckedOutBooks(MEMBER_2);
     assertEquals(1, checkedOutMbr1.size());
     assertEquals(0, checkedOutMbr2.size());
-    assertEquals(book1.getUid(), checkedOutMbr1.get(0).getUid());
+    assertEquals(BOOK_1.getUid(), checkedOutMbr1.get(0).getUid());
 
-    // Member 1 checks out book2, Member 2 nothing
-    library.checkout(book2, member1);
-    checkedOutMbr1 = library.getCheckedOutBooks(member1);
+    // Member 1 checks out BOOK_2, Member 2 nothing
+    library.checkout(BOOK_2, MEMBER_1);
+    checkedOutMbr1 = library.getCheckedOutBooks(MEMBER_1);
     assertEquals(checkedOutMbr1.size(), 2);
-    assertEquals(book1.getUid(), checkedOutMbr1.get(0).getUid());
-    assertEquals(book2.getUid(), checkedOutMbr1.get(1).getUid());
+    assertEquals(BOOK_1.getUid(), checkedOutMbr1.get(0).getUid());
+    assertEquals(BOOK_2.getUid(), checkedOutMbr1.get(1).getUid());
 
-    // Member 1 returns book2, Member 2 checks out book 1
-    library.returnBook(book1);
-    library.checkout(book1, member2);
-    checkedOutMbr1 = library.getCheckedOutBooks(member1);
-    checkedOutMbr2 = library.getCheckedOutBooks(member2);
+    // Member 1 returns BOOK_2, Member 2 checks out book 1
+    library.returnBook(BOOK_1);
+    library.checkout(BOOK_1, MEMBER_2);
+    checkedOutMbr1 = library.getCheckedOutBooks(MEMBER_1);
+    checkedOutMbr2 = library.getCheckedOutBooks(MEMBER_2);
     assertEquals(1, checkedOutMbr1.size());
     assertEquals(1, checkedOutMbr2.size());
-    assertEquals(book1.getUid(), checkedOutMbr2.get(0).getUid());
-    assertEquals(book2.getUid(), checkedOutMbr1.get(0).getUid());
+    assertEquals(BOOK_1.getUid(), checkedOutMbr2.get(0).getUid());
+    assertEquals(BOOK_2.getUid(), checkedOutMbr1.get(0).getUid());
   }
 
   @Test
@@ -202,6 +179,6 @@ public class LibraryIntegrationTest {
 
     library.addBooks(books);
     assertThrows(IllegalArgumentException.class,
-        () -> books.forEach(b -> library.checkout(b, member1)));
+        () -> books.forEach(b -> library.checkout(b, MEMBER_1)));
   }
 }

@@ -43,7 +43,7 @@ public class Fine {
   public Fine(BookCheckout bookCheckout) {
 
     this.bookCheckout = bookCheckout;
-    long days = DAYS.between(LocalDateTime.now(), bookCheckout.getReturnDate());
+    long days = DAYS.between(LocalDate.now(), bookCheckout.getReturnDate());
     this.amount = Math.toIntExact(days * 10);
     this.imposedDate = LocalDate.now();
     this.paymentDate = null;

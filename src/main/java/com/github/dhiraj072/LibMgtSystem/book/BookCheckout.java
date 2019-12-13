@@ -37,7 +37,7 @@ public class BookCheckout {
   private LocalDate checkoutDate;
 
   @Column
-  private LocalDateTime returnDate;
+  private LocalDate returnDate;
 
   public BookCheckout() { }
 
@@ -53,12 +53,12 @@ public class BookCheckout {
   public static final String MEMBER = "member";
   public static final String RETURN_DATE = "returnDate";
 
-  public LocalDateTime getReturnDate() {
+  public LocalDate getReturnDate() {
 
     return returnDate;
   }
 
-  public void setReturnDate(LocalDateTime returnDate) {
+  public void setReturnDate(LocalDate returnDate) {
 
     this.returnDate = returnDate;
   }
