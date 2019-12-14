@@ -24,6 +24,9 @@ public class EmailNotificationSender implements NotificationSender {
         LOGGER.info("Sending late notification email to {}", checkout.getMember());
         mailSender.send(MailTemplates.bookLateNotification(checkout));
         break;
+      case REMINDER:
+        mailSender.send(MailTemplates.bookReturnReminderNotification(checkout));
+        break;
       default:
         throw new IllegalArgumentException("Unsupported notification type");
     }

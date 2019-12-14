@@ -1,10 +1,12 @@
-package com.github.dhiraj072.LibMgtSystem;
+package com.github.dhiraj072.LibMgtSystem.fine;
 
 import static com.github.dhiraj072.LibMgtSystem.TestUtils.BOOK_1;
 import static com.github.dhiraj072.LibMgtSystem.TestUtils.MEMBER_1;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.github.dhiraj072.LibMgtSystem.H2IntegrationTest;
+import com.github.dhiraj072.LibMgtSystem.Library;
 import com.github.dhiraj072.LibMgtSystem.fine.Fine;
 import java.util.List;
 import javax.annotation.Resource;
