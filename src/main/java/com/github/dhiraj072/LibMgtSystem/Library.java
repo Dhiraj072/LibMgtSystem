@@ -100,6 +100,11 @@ public class Library {
     LOGGER.info("Book {} has been returned to library", book.getUid());
   }
 
+  public void payFine(Fine fine) {
+
+    fineDAO.payFine(fine);
+  }
+
   public List<Fine> getPendingFines(Member m) {
 
     return fineDAO.getPendingFines(m);

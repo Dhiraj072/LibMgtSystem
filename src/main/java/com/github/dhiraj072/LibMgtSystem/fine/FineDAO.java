@@ -5,6 +5,7 @@ import static com.github.dhiraj072.LibMgtSystem.fine.Fine.PAYMENT_DATE;
 
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
+import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -51,5 +52,12 @@ public class FineDAO {
     Predicate fineNotPaid = cb.isNull(fine.get(PAYMENT_DATE));
     searchQuery.where(checkedOutByMember, fineNotPaid);
     return em.createQuery(searchQuery).getResultList();
+  }
+
+  public void payFine(Fine fine) {
+
+    fine.setPaymentDate(LocalDate.now());
+    em.persist(fine);
+    LOGGER.info("Fine of {} on {} has been paid", fine.getAmount(), fine.getBookCheckout());
   }
 }

@@ -63,4 +63,9 @@ public class Fine {
 
     return bookCheckout;
   }
+
+  public void setPaymentDate(LocalDate paymentDate) {
+
+    this.paymentDate = paymentDate;
+  }
 }

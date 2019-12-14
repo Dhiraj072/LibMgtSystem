@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.dhiraj072.LibMgtSystem.H2IntegrationTest;
 import com.github.dhiraj072.LibMgtSystem.Library;
-import com.github.dhiraj072.LibMgtSystem.fine.Fine;
 import java.util.List;
 import javax.annotation.Resource;
 import org.junit.jupiter.api.AfterAll;
@@ -35,6 +34,8 @@ public class ImposeFineIntegrationTest {
     assertEquals(1, imposedFines.size());
     Fine imposedFine = imposedFines.get(0);
     assertEquals(MEMBER_1.getUserName(), imposedFine.getBookCheckout().getMember().getUserName());
+    library.payFine(imposedFine);
+    assertEquals(0, library.getPendingFines(MEMBER_1).size());
   }
 
   @AfterAll
