@@ -35,11 +35,12 @@ public class FineDAO {
     cb = em.getCriteriaBuilder();
   }
 
-  public void imposeFine(BookCheckout checkout) {
+  public Fine imposeFine(BookCheckout checkout) {
 
     Fine fine = new Fine(checkout);
     em.persist(fine);
     LOGGER.info("Fine of {} imposed on {}", fine.getAmount(), checkout.getMember());
+    return fine;
   }
 
   public List<Fine> getPendingFines(Member m) {

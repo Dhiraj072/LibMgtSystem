@@ -10,8 +10,12 @@ import com.github.dhiraj072.LibMgtSystem.fine.FineDAO;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import com.github.dhiraj072.LibMgtSystem.fine.Fine;
 import com.github.dhiraj072.LibMgtSystem.member.MemberDAO;
+import com.github.dhiraj072.LibMgtSystem.notifications.NotificationSender;
+import com.github.dhiraj072.LibMgtSystem.notifications.NotificationSender.Type;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -41,6 +45,9 @@ public class Library {
 
   @Resource
   private MemberDAO memberDAO;
+
+  @Resource
+  private List<NotificationSender> notificationSenders;
 
   public void addMember(Member m) {
 
@@ -95,8 +102,14 @@ public class Library {
     if (!bookDAO.isCheckedOut(book))
       throw new IllegalArgumentException("Invalid return for " + book.getUid() +" not checked out");
     BookCheckout updatedCheckout = bookDAO.returnBook(book);
-    if (isLateReturn(updatedCheckout))
-      fineDAO.imposeFine(updatedCheckout);
+    if (isLateReturn(updatedCheckout)) {
+
+      Fine fine = fineDAO.imposeFine(updatedCheckout);
+      Map<String, String> meta = new HashMap<>();
+      meta.put("amount", fine.getAmount().toString());
+      notificationSenders.forEach(notificationSender ->
+          notificationSender.sendNotification(updatedCheckout, Type.FINE_IMPOSED,meta));
+    }
     LOGGER.info("Book {} has been returned to library", book.getUid());
   }
 

@@ -22,28 +22,44 @@ public class MailTemplates {
       + "to return the book %s. Kindly return the book by the deadline to avoid fines.\n"
       + LIBRARY_SIGNATURE;
 
+  public static final String FINE_IMPOSED_NOTIFICATION_SUB = "Fine imposed notification";
+  public static final String FINE_IMPOSED_NOTIFICATION_BODY = "\"Dear %s,\\n\"\n"
+      + "This is to notify you that a fine of %s has been imposed for the late \"\n"
+      + "return of the book %s.\n"
+      + LIBRARY_SIGNATURE;
+
   public static SimpleMailMessage bookLateNotification(BookCheckout checkout) {
 
-    return buildMessage(checkout, LATE_BOOK_NOTIFICATION_SUB, LATE_NOTIFICATION_NOTIFICATION_BODY);
-
+    String body = String.format(LATE_NOTIFICATION_NOTIFICATION_BODY,
+        checkout.getMember().getUserName(),
+        checkout.getCheckoutDate().plusDays(MAX_DAYS),
+        checkout.getBook().getTitle());
+    return buildMessage(checkout.getMember().getEmail(), LATE_BOOK_NOTIFICATION_SUB, body);
   }
 
   public static SimpleMailMessage bookReturnReminderNotification(BookCheckout checkout) {
 
-    return buildMessage(checkout, REMINDER_BOOK_NOTIFICATION_SUB, REMINDER_NOTIFICATION_NOTIFICATION_BODY);
-  }
-
-  private static SimpleMailMessage buildMessage(BookCheckout checkout, String MSG_SUBJECT,
-      String MSG_BODY) {
-
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setText(String.format(MSG_BODY,
+    String body = String.format(REMINDER_NOTIFICATION_NOTIFICATION_BODY,
         checkout.getMember().getUserName(),
         checkout.getCheckoutDate().plusDays(MAX_DAYS),
-        checkout.getBook().getTitle()));
+        checkout.getBook().getTitle());
+  return buildMessage(checkout.getMember().getEmail(), REMINDER_BOOK_NOTIFICATION_SUB, body);
+  }
+
+  public static SimpleMailMessage fineImposedNotification(BookCheckout checkout, String amount) {
+
+    String body = String.format(FINE_IMPOSED_NOTIFICATION_BODY, checkout.getMember().getName(),
+        amount, checkout.getBook().getTitle());
+    return buildMessage(checkout.getMember().getEmail(), FINE_IMPOSED_NOTIFICATION_SUB, body);
+  }
+
+  private static SimpleMailMessage buildMessage(String to, String MSG_SUBJECT, String MSG_BODY) {
+
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setText(MSG_BODY);
     message.setFrom(LIBRARY_EMAIL);
     message.setSubject(MSG_SUBJECT);
-    message.setTo(checkout.getMember().getEmail());
+    message.setTo(to);
     return message;
   }
 }

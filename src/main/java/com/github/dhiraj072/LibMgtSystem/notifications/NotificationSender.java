@@ -1,6 +1,7 @@
 package com.github.dhiraj072.LibMgtSystem.notifications;
 
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
+import java.util.Map;
 
 /**
  * Interface that can be implemented by classes which want to send notifications for
@@ -11,8 +12,13 @@ public interface NotificationSender {
 
   public enum Type {
 
-    LATE, REMINDER
+    LATE, REMINDER, FINE_IMPOSED
   }
 
-  void sendNotification(BookCheckout checkout, Type type);
+  default void sendNotification(BookCheckout checkout, Type type) {
+
+    sendNotification(checkout, type, null);
+  }
+
+  void sendNotification(BookCheckout checkout, Type type, Map<String, String> metadata);
 }
