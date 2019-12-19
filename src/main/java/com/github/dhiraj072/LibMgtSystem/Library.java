@@ -1,6 +1,7 @@
 package com.github.dhiraj072.LibMgtSystem;
 
 import static com.github.dhiraj072.LibMgtSystem.member.Member.MAX_BOOKS;
+import static com.github.dhiraj072.LibMgtSystem.system.System.MAX_DAYS;
 
 import com.github.dhiraj072.LibMgtSystem.book.Book;
 import com.github.dhiraj072.LibMgtSystem.book.BookCheckout;
@@ -12,7 +13,6 @@ import com.github.dhiraj072.LibMgtSystem.fine.Fine;
 import com.github.dhiraj072.LibMgtSystem.member.MemberDAO;
 import com.github.dhiraj072.LibMgtSystem.notifications.NotificationSender;
 import com.github.dhiraj072.LibMgtSystem.notifications.NotificationSender.Type;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +125,6 @@ public class Library {
 
   private boolean isLateReturn(BookCheckout latest) {
 
-    return latest.getReturnDate().plusDays(10).isAfter(LocalDate.now());
+    return latest.getCheckoutDate().plusDays(MAX_DAYS).isBefore(latest.getReturnDate());
   }
 }
