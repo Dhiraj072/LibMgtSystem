@@ -32,7 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .authenticationEntryPoint(restAuthenticationEntryPoint)
     .and()
       .authorizeRequests()
-      .antMatchers("/do_login").permitAll()
       .antMatchers("/login").permitAll()
       .anyRequest().authenticated()
     .and()

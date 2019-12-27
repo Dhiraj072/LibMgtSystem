@@ -63,7 +63,7 @@ public class LoginLogoutIntegrationTest {
         .auth().form("user", "password",
         new FormAuthConfig("/login", "username", "password"))
     .when()
-        .post("/logout")
+        .get("/logout")
         .then()
         .statusCode(302); // redirects to login
   }
