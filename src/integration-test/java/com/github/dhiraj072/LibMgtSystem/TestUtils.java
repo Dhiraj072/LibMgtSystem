@@ -9,8 +9,8 @@ public class TestUtils {
   public static final String UID_1 = "1";
   public static final String UID_2 = "2";
 
-  public static final Member MEMBER_1 = new Member("name1", "name1@bot.com");
-  public static final Member MEMBER_2 = new Member("name2", "name2@bot.com");
+  public static final Member MEMBER_1 = new Member("name1", "name1@bot.com", "pass");
+  public static final Member MEMBER_2 = new Member("name2", "name2@bot.com", "pass");
 
   public static final Book BOOK_1 = new Book(UID_1, "F24", "334", "Title1",
       "Author1", "Category1", LocalDate.now());

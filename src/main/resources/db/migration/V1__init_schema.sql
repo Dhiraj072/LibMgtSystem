@@ -16,6 +16,7 @@ CREATE TABLE member (
    name VARCHAR(50) NOT NULL,
    email VARCHAR(50) NOT NULL,
    join_date DATE NOT NULL,
+   password VARCHAR(60) NOT NULL,
    primary key (user_name)
 );
 

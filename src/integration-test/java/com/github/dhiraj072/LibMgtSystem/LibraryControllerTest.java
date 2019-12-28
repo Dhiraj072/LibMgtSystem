@@ -1,20 +1,20 @@
 package com.github.dhiraj072.LibMgtSystem;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+import com.github.dhiraj072.LibMgtSystem.exceptions.UsernameExistsException;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import io.restassured.RestAssured;
 import io.restassured.authentication.FormAuthConfig;
 import javax.annotation.Resource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LibraryControllerTest {
 
@@ -24,21 +24,37 @@ public class LibraryControllerTest {
   @Resource
   private Library library;
 
-  private FormAuthConfig authConfig = new FormAuthConfig("/login", "username", "password");
+  @Resource
+  private PasswordEncoder bCryptEncoder;
+
+  private FormAuthConfig authConfig =
+      new FormAuthConfig("/login", "username", "password");
+
+  @BeforeEach
+  public void setup() {
+
+    try {
+
+      library.addMember(new Member("foo", "foo@bar.com", bCryptEncoder.encode("pass")));
+    } catch (UsernameExistsException e) {
+
+      // consume
+    }
+  }
 
   @Test
   public void testGetsExistingMemberCorrectly() {
 
     RestAssured.port = serverPort;
-    library.addMember(new Member("foo", "foo@bar.com"));
     given()
-        .auth().form("user", "password", authConfig)
+        .auth().form("foo", "pass", authConfig)
     .when()
         .get("/member/foo")
     .then()
         .assertThat()
         .statusCode(200)
-        .body("userName", equalTo("foo"));
+        .body("userName", equalTo("foo"))
+        .body("password", equalTo(null)); // ensure we don't expose password via rest api
   }
 
   @Test
@@ -46,9 +62,9 @@ public class LibraryControllerTest {
 
     RestAssured.port = serverPort;
     given()
-        .auth().form("user", "password", authConfig)
+        .auth().form("foo", "pass", authConfig)
     .when()
-        .get("/member/foo")
+        .get("/member/bar")
     .then()
         .assertThat()
         .statusCode(400);

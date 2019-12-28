@@ -1,5 +1,6 @@
 package com.github.dhiraj072.LibMgtSystem.member;
 
+import com.github.dhiraj072.LibMgtSystem.exceptions.UsernameExistsException;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -7,10 +8,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.transaction.reactive.TransactionContext;
-import org.springframework.transaction.reactive.TransactionContextManager;
 
 @Component
 public class MemberDAO {
@@ -30,6 +27,8 @@ public class MemberDAO {
 
   public void addMember(Member m) {
 
+    if (getMember(m.getUserName()) != null)
+      throw new UsernameExistsException(m);
     em.persist(m);
   }
 

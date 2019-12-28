@@ -1,5 +1,6 @@
 package com.github.dhiraj072.LibMgtSystem.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,17 +16,18 @@ public class Member {
 
   public Member() { }
 
-  public Member(String userName, String email) {
+  public Member(String userName, String email, String password) {
 
-    this(userName, userName, email);
+    this(userName, userName, email, password);
   }
 
-  public Member(String userName, String name, String email) {
+  public Member(String userName, String name, String email, String password) {
 
     this.userName = userName;
     this.name = name;
     this.joinDate = LocalDate.now();
     this.email = email;
+    this.password = password;
   }
 
   @GeneratedValue(strategy= GenerationType.AUTO)
@@ -41,6 +43,10 @@ public class Member {
   @Email
   @Column
   private String email;
+
+  @Column
+  @JsonIgnore
+  private  String password;
 
   @Column
   private LocalDate joinDate;
@@ -68,6 +74,11 @@ public class Member {
   public String getEmail() {
 
     return email;
+  }
+
+  public String getPassword() {
+
+    return password;
   }
 
   @Override
