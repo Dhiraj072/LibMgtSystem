@@ -13,6 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 
+/**
+ * This encapsulates every configuration we need to run our integration tests.
+ * This is transactional and any database calls made in the tests annotated with
+ * this class will be rolled back
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

@@ -10,7 +10,6 @@ import com.github.dhiraj072.LibMgtSystem.H2IntegrationTest;
 import com.github.dhiraj072.LibMgtSystem.Library;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
@@ -33,7 +32,7 @@ public class ImposeFineIntegrationTest {
   private GreenMail smtpServer;
 
   @BeforeAll
-  void setup() throws IOException {
+  void setup() {
 
     smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"));
     smtpServer.start();

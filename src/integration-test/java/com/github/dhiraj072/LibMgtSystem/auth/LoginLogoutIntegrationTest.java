@@ -2,9 +2,11 @@ package com.github.dhiraj072.LibMgtSystem.auth;
 
 import static io.restassured.RestAssured.given;
 
+import com.github.dhiraj072.LibMgtSystem.Library;
+import com.github.dhiraj072.LibMgtSystem.member.Member;
 import io.restassured.RestAssured;
 import io.restassured.authentication.FormAuthConfig;
-import io.restassured.http.Cookie;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -24,17 +27,29 @@ public class LoginLogoutIntegrationTest {
   @LocalServerPort
   private int serverPort;
 
-  private Cookie cookie;
+  @Resource
+  private Library library;
+
+  @Resource
+  private PasswordEncoder bCryptEncoder;
+
+  private static boolean setupDone;
 
   @BeforeEach
   public void setup() {
 
+    LOGGER.info("Setup done {}", setupDone);
+    if (setupDone)
+      return;
     RestAssured.port = serverPort;
+    library.addMember(new Member("foo", "foo@bar.com", bCryptEncoder.encode("pass")));
+    setupDone = true;
   }
 
   @Test
   public void testLoginRejectsWithBadCredentials() {
 
+    RestAssured.port = serverPort;
     given()
         .param("username", "user")
         .param("password", "paword")
@@ -48,8 +63,8 @@ public class LoginLogoutIntegrationTest {
   public void testLogsInCorrectlyWithGoodCredentials() {
 
     given()
-        .param("username", "user")
-        .param("password", "password")
+        .param("username", "foo")
+        .param("password", "pass")
         .when()
         .post("/login")
         .then()
@@ -60,10 +75,10 @@ public class LoginLogoutIntegrationTest {
   public void testLogOutsCorrectly() {
 
     given()
-        .auth().form("user", "password",
+        .auth().form("foo", "pass",
         new FormAuthConfig("/login", "username", "password"))
     .when()
-        .get("/logout")
+        .post("/logout")
         .then()
         .statusCode(302); // redirects to login
   }

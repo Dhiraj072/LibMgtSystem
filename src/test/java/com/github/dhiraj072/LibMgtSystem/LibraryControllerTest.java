@@ -2,6 +2,7 @@ package com.github.dhiraj072.LibMgtSystem;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import com.github.dhiraj072.LibMgtSystem.controllers.MemberController;
 import com.github.dhiraj072.LibMgtSystem.member.Member;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ class LibraryControllerTest {
   private Library library;
 
   @InjectMocks
-  private LibraryController controller;
+  private MemberController controller;
 
   @BeforeEach
   void setup() {
@@ -31,7 +32,7 @@ class LibraryControllerTest {
   @Test
   void testGetsMemberCorrectly() {
 
-    Member member = new Member("username", "email");
+    Member member = new Member("username", "email", "pass");
     MockitoAnnotations.initMocks(this);
     Mockito.when(library.getMember(anyString())).thenReturn(member);
     RestAssuredMockMvc
