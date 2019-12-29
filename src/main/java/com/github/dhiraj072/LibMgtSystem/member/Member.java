@@ -1,6 +1,7 @@
 package com.github.dhiraj072.LibMgtSystem.member;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,7 +46,7 @@ public class Member {
   private String email;
 
   @Column
-  @JsonIgnore
+  @JsonProperty(access = Access.WRITE_ONLY)
   private  String password;
 
   @Column
@@ -81,9 +82,19 @@ public class Member {
     return password;
   }
 
+  public void setJoinDate(LocalDate joinDate) {
+
+    this.joinDate = joinDate;
+  }
+
   @Override
   public String toString() {
 
-    return this.getUserName();
+    return this.getUserName() + ":" + this.getEmail() + ":" + this.getPassword();
+  }
+
+  public void setName(String name) {
+
+    this.name = name;
   }
 }

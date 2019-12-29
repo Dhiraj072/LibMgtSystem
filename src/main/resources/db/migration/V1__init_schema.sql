@@ -13,7 +13,7 @@ CREATE TABLE book (
 CREATE TABLE member (
    id INT NOT NULL AUTO_INCREMENT,
    user_name VARCHAR(50) NOT NULL,
-   name VARCHAR(50) NOT NULL,
+   name VARCHAR(50),
    email VARCHAR(50) NOT NULL,
    join_date DATE NOT NULL,
    password VARCHAR(60) NOT NULL,

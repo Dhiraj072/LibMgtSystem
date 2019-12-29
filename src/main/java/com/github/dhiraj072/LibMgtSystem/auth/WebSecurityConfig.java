@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -27,6 +26,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Resource
   private LibraryUserDetailsService userDetailsService;
+
+  @Resource
+  private PasswordEncoder bCryptEncoder;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -54,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setUserDetailsService(userDetailsService);
-    provider.setPasswordEncoder(bCryptEncoder());
+    provider.setPasswordEncoder(bCryptEncoder);
     return provider;
   }
 
@@ -62,11 +64,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(AuthenticationManagerBuilder auth) {
 
     auth.authenticationProvider(provider());
-  }
-
-  @Bean
-  public PasswordEncoder bCryptEncoder() {
-
-    return new BCryptPasswordEncoder();
   }
 }

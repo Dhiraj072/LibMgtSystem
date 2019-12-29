@@ -2,6 +2,9 @@ package com.github.dhiraj072.LibMgtSystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class LibMgtSystemApplication {
@@ -11,4 +14,9 @@ public class LibMgtSystemApplication {
 		SpringApplication.run(LibMgtSystemApplication.class, args);
 	}
 
+	@Bean
+	public PasswordEncoder bCryptEncoder() {
+
+		return new BCryptPasswordEncoder();
+	}
 }
