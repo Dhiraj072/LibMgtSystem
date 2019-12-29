@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.2.1.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 	id 'java'
+	id 'jacoco'
 }
 
 group = 'com.github.dhiraj072'
@@ -62,6 +63,16 @@ tasks.withType(Test) {
 					"${result.failedTestCount} failed, " +
 					"${result.skippedTestCount} skipped"
 		}
+	}
+}
+
+jacocoTestReport {
+	executionData test, integrationTest
+	reports {
+		xml.enabled true
+		xml.destination file('build/reports/jacoco/report.xml')
+		html.enabled true
+		html.destination file('build/reports/jacoco/report.html')
 	}
 }
 
